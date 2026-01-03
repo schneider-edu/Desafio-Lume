@@ -1,4 +1,4 @@
-# Desafio Técnico (Monorepo) — Spring Boot (Java 21) + React
+# Desafio Técnico — Spring Boot (Java 21) + React
 
 Este repositório contém:
 - `backend/`: API Spring Boot (Java 21, Maven, H2, JPA, Security com JWT + Refresh Token, Swagger)
