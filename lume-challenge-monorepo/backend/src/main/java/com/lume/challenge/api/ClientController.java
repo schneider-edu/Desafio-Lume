@@ -23,8 +23,11 @@ public class ClientController {
   }
 
   @GetMapping
-  public List<ClientDtos.ClientResponse> list(@RequestParam(required = false) String query) {
-    return clientService.list(query);
+  public List<ClientDtos.ClientResponse> list(
+      @RequestParam(required = false) String cep,
+      @RequestParam(required = false) String name
+  ) {
+    return clientService.list(cep, name);
   }
 
   @GetMapping("/{id}")

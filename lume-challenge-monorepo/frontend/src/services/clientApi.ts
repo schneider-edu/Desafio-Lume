@@ -16,8 +16,8 @@ export type Client = {
 export type ClientRequest = Omit<Client, "id">;
 
 export const clientApi = {
-  async list(query?: string): Promise<Client[]> {
-    const res = await http.get("/clients", { params: query ? { query } : {} });
+  async list(params?: { cep?: string; name?: string }): Promise<Client[]> {
+    const res = await http.get("/clients", { params });
     return res.data;
   },
   async get(id: number): Promise<Client> {

@@ -20,7 +20,8 @@ import ClientFormDialog from "../components/ClientFormDialog";
 export default function ClientsPage() {
   const { logout } = useAuth();
 
-  const [query, setQuery] = useState("");
+  const [cepQuery, setCepQuery] = useState("");
+  const [nameQuery, setNameQuery] = useState("");
   const [rows, setRows] = useState<Client[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,10 @@ export default function ClientsPage() {
     setError(null);
     setLoading(true);
     try {
-      const data = await clientApi.list(query || undefined);
+      const data = await clientApi.list({
+        cep: cepQuery || undefined,
+        name: nameQuery || undefined
+      });
       setRows(data);
     } catch {
       setError("Falha ao carregar clientes.");
@@ -130,9 +134,15 @@ export default function ClientsPage() {
 
       <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mb: 2 }}>
         <TextField
-          label="Buscar (nome ou CPF)"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          label="Buscar por CEP"
+          value={cepQuery}
+          onChange={(e) => setCepQuery(e.target.value.replace(/\D/g, ""))}
+          fullWidth
+        />
+        <TextField
+          label="Buscar por nome"
+          value={nameQuery}
+          onChange={(e) => setNameQuery(e.target.value)}
           fullWidth
         />
         <Button variant="outlined" onClick={load} disabled={loading}>

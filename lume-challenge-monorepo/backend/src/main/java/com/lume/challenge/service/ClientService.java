@@ -43,15 +43,27 @@ public class ClientService {
   }
 
   @Transactional(readOnly = true)
-  public List<ClientDtos.ClientResponse> list(String query) {
-    if (query == null || query.isBlank()) {
+  public List<ClientDtos.ClientResponse> list(String cepQuery, String nameQuery) {
+    String cep = digitsOnly(cepQuery);
+    String name = trim(nameQuery);
+
+    if (isBlank(cep) && isBlank(name)) {
       return clientRepository.findAll().stream().map(this::toResponse).toList();
     }
-    String q = query.trim();
-    String digits = q.replaceAll("\\D", "");
-    return clientRepository.findByNameContainingIgnoreCaseOrCpfContaining(q, digits).stream()
-        .map(this::toResponse)
-        .toList();
+
+    if (!isBlank(cep) && !isBlank(name)) {
+      return clientRepository
+          .findByCepContainingAndNameContainingIgnoreCase(cep, name)
+          .stream()
+          .map(this::toResponse)
+          .toList();
+    }
+
+    if (!isBlank(cep)) {
+      return clientRepository.findByCepContaining(cep).stream().map(this::toResponse).toList();
+    }
+
+    return clientRepository.findByNameContainingIgnoreCase(name).stream().map(this::toResponse).toList();
   }
 
   @Transactional
@@ -103,6 +115,12 @@ public class ClientService {
   }
 
   private void fillAddressFromCepIfNeeded(Client c) {
+    validateCep(c.getCep());
+
+    if (!isBlank(c.getLogradouro()) && !isBlank(c.getBairro()) && !isBlank(c.getCidade()) && !isBlank(c.getUf())) {
+      return;
+    }
+
     var addr = viaCepClient.lookup(c.getCep());
 
     if (isBlank(c.getLogradouro())) c.setLogradouro(addr.logradouro());
@@ -142,5 +160,11 @@ public class ClientService {
 
   private boolean isBlank(String s) {
     return s == null || s.isBlank();
+  }
+
+  private void validateCep(String cep) {
+    if (cep == null || !cep.matches("\\d{8}")) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "CEP inválido");
+    }
   }
 }
