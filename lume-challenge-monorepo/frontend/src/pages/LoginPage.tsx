@@ -56,9 +56,6 @@ export default function LoginPage() {
               Entrar
             </Button>
 
-            <Typography variant="body2" color="text.secondary">
-              Primeiro, registre um usuário via Swagger: POST /auth/register
-            </Typography>
           </Stack>
         </CardContent>
       </Card>
